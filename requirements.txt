@@ -1,9 +1,10 @@
 fastapi
 uvicorn[standard]
-pandas
+sqlalchemy[asyncio]
+asyncpg
+redis
 h3
-geopandas
-shapely
+polars
+lightgbm
+joblib
 python-dotenv
-prophet
-cmdstanpy

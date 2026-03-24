@@ -1,11 +1,19 @@
 from fastapi import FastAPI
-from .routers import predict, ingest   # add predict here
+from .routers import ingest, predict
 
-app = FastAPI(title="PulseDrop API", version="1.0")
+app = FastAPI(
+    title="PulseDrop",
+    description="H3-powered Last-Mile Delivery Optimizer",
+    version="1.0.0"
+)
 
-app.include_router(ingest.router)     # your existing GPS ingest
-app.include_router(predict.router)    # ← ADD THIS LINE
+app.include_router(ingest.router)
+app.include_router(predict.router)
 
 @app.get("/")
 async def root():
-    return {"message": "PulseDrop Last-Mile Optimizer API is running 🚀"}
+    return {
+        "message": "🚀 PulseDrop API is running",
+        "docs": "/docs",
+        "predict_example": "/predict/13.0827/80.2707"
+    }

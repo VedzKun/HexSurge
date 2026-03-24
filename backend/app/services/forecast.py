@@ -2,13 +2,12 @@ import joblib
 import os
 
 def load_model():
-    model_path = "model.pkl"
+    model_path = "backend/model.pkl"
     if os.path.exists(model_path):
         return joblib.load(model_path)
     else:
-        # Fallback dummy model for development
-        print("⚠️  model.pkl not found — using dummy predictor")
+        print("⚠️  model.pkl not found — using dummy model")
         class DummyModel:
             def predict(self, X):
-                return [5.0] * len(X)   # average demand
+                return [6.5] * len(X)   # average demand for Chennai
         return DummyModel()

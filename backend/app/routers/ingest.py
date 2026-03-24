@@ -1,26 +1,29 @@
-# backend/app/routers/ingest.py
 from fastapi import APIRouter, Depends
 import h3
 import redis.asyncio as redis
 from sqlalchemy.ext.asyncio import AsyncSession
+from ..database import get_db
+from ..dependencies import get_redis
 
-router = APIRouter()
+router = APIRouter(prefix="/gps", tags=["ingest"])
 
-@router.post("/gps/ingest")
+@router.post("/ingest")
 async def ingest_gps(
-    lat: float, lng: float, company_id: int,
+    lat: float,
+    lng: float,
+    company_id: int = 1,
     db: AsyncSession = Depends(get_db),
     r: redis.Redis = Depends(get_redis)
 ):
-    cell = h3.latlng_to_cell(lat, lng, 9)          # res 9 = ~340m
-    cell_int = int(cell)                            # store as bigint
+    cell = h3.latlng_to_cell(lat, lng, 9)
+    cell_int = int(cell)
 
-    # Store raw ping
-    await db.execute("INSERT INTO gps_pings ...")
+    # Store in Redis (live supply)
+    await r.hincrby(f"supply:{cell_int}", company_id, 1)
+    await r.expire(f"supply:{cell_int}", 300)  # 5 minutes
 
-    # Real-time Redis update (Uber pattern)
-    await r.hincrby(f"supply:{cell_int}", company_id, 1)   # live driver count
-    await r.expire(f"supply:{cell_int}", 300)              # 5-min window
-
-    # Trigger quick forecast refresh if needed
-    return {"h3_cell": cell, "status": "indexed"}
+    return {
+        "status": "ingested",
+        "h3_cell": cell,
+        "h3_cell_int": cell_int
+    }
