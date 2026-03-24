@@ -1,20 +1,11 @@
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
+from .routers import predict, ingest   # add predict here
 
-from services import forecast
+app = FastAPI(title="PulseDrop API", version="1.0")
 
-app = FastAPI(title="PulseDrop Backend")
+app.include_router(ingest.router)     # your existing GPS ingest
+app.include_router(predict.router)    # ← ADD THIS LINE
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-app.include_router(forecast.router, prefix="/api/forecast", tags=["forecast"])
-
-@app.get("/health")
-async def health():
-    return {"status": "ok"}
+@app.get("/")
+async def root():
+    return {"message": "PulseDrop Last-Mile Optimizer API is running 🚀"}
