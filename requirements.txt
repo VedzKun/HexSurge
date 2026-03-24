@@ -1,10 +1,5 @@
-fastapi
-uvicorn[standard]
-sqlalchemy[asyncio]
-asyncpg
-redis
-h3
-polars
-lightgbm
-joblib
-python-dotenv
+fastapi==0.115.12
+uvicorn[standard]==0.34.0
+redis==5.2.1
+h3==4.2.1
+python-dotenv==1.0.1

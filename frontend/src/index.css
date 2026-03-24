@@ -1,0 +1,295 @@
+:root {
+  --bg: #000000;
+  --fg: #ffffff;
+  --accent: #ff6600;
+  --green: #48c774;
+  --red: #ff2200;
+  --panel: #0b0b0b;
+  --border: 5px solid #ffffff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: "IBM Plex Mono", "Courier New", monospace;
+}
+
+h1,
+h2,
+h3,
+button {
+  font-family: "Arial Black", "Inter", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.app {
+  min-height: 100vh;
+  padding: 24px;
+  display: grid;
+  gap: 20px;
+}
+
+.brutal-border {
+  border: var(--border);
+  border-radius: 0;
+}
+
+.hero {
+  padding: 18px 24px;
+}
+
+.hero h1 {
+  margin: 0;
+  font-size: clamp(3rem, 9vw, 7rem);
+  line-height: 0.9;
+}
+
+.hero p {
+  margin: 12px 0 0;
+  color: #cccccc;
+}
+
+.hero p + p {
+  margin-top: 6px;
+  color: #9a9a9a;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(170px, 1fr));
+  gap: 14px;
+}
+
+.stat-card {
+  padding: 14px;
+  min-height: 130px;
+}
+
+.stat-title {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #c8c8c8;
+}
+
+.stat-value {
+  margin: 20px 0 0;
+  font-size: clamp(1.7rem, 3vw, 2.6rem);
+}
+
+.layout-grid {
+  display: grid;
+  grid-template-columns: 2.2fr 1fr;
+  gap: 14px;
+  min-height: 480px;
+}
+
+.map-shell {
+  position: relative;
+  min-height: 480px;
+  height: 100%;
+  overflow: hidden;
+}
+
+.map-shell canvas,
+.map-shell .deckgl-overlay,
+.map-shell .maplibregl-map {
+  inset: 0;
+}
+
+.zones-panel {
+  padding: 12px;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 10px;
+}
+
+.zones-panel h2,
+.controls h2 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.zones-scroll {
+  overflow: auto;
+  display: grid;
+  gap: 8px;
+  align-content: start;
+}
+
+.zone-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  font-weight: 700;
+}
+
+.zone-row.green {
+  border-color: var(--green);
+  color: var(--green);
+}
+
+.zone-row.orange {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.zone-row.red {
+  border-color: var(--red);
+  color: var(--red);
+}
+
+.controls {
+  padding: 14px;
+  display: grid;
+  gap: 12px;
+}
+
+.controls-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+input {
+  background: transparent;
+  border: var(--border);
+  color: var(--fg);
+  font: inherit;
+  padding: 12px;
+}
+
+select {
+  background: var(--panel);
+  border: var(--border);
+  color: var(--fg);
+  font: inherit;
+  padding: 12px;
+}
+
+.toggles {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(180px, 1fr));
+  gap: 10px;
+}
+
+.toggle-card {
+  padding: 12px;
+  background: transparent;
+  display: grid;
+  gap: 8px;
+}
+
+.toggle-title {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #c8c8c8;
+}
+
+.range-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  align-items: center;
+}
+
+input[type="range"] {
+  border: none;
+  padding: 0;
+}
+
+.pill {
+  border: var(--border);
+  padding: 8px 10px;
+  min-width: 72px;
+  text-align: center;
+  font-weight: 800;
+}
+
+.suggestions {
+  padding: 12px;
+  display: grid;
+  gap: 8px;
+}
+
+.move-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  align-items: center;
+  padding: 10px;
+}
+
+input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.button-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+button {
+  border: var(--border);
+  background: transparent;
+  color: var(--fg);
+  padding: 12px 18px;
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.btn-orange {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.btn-white:hover,
+.btn-orange:hover {
+  background: #111111;
+}
+
+.muted {
+  color: #999;
+}
+
+.status-line {
+  margin: 0;
+  min-height: 22px;
+  color: #ddd;
+}
+
+.status-line.error {
+  color: var(--red);
+}
+
+@media (max-width: 1080px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, minmax(140px, 1fr));
+  }
+
+  .layout-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .button-row {
+    flex-direction: column;
+  }
+}
