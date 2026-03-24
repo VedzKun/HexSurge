@@ -1,6 +1,6 @@
-# PulseDrop-prod
+# HexSurge-prod
 
-Minimal scaffold for PulseDrop prototype.
+Minimal scaffold for HexSurge prototype.
 
 Backend: FastAPI exposing forecast endpoints sourced from `forecasts.csv`.
 
