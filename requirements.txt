@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+pandas
+h3
+geopandas
+shapely
+python-dotenv
+prophet
+cmdstanpy
