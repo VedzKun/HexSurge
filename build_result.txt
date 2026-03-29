@@ -1,0 +1,66 @@
+﻿
+> hexsurge-frontend@1.0.0 build
+> vite build
+
+[36mvite v5.4.21 [32mbuilding for production...[36m[39m
+transforming...
+npm : node_modules/@
+loaders.gl/worker-ut
+ils/dist/lib/process
+-utils/child-process
+-proxy.js (56:50): 
+"spawn" is not 
+exported by "__vite-
+browser-external", 
+imported by "node_mo
+dules/@loaders.gl/wo
+rker-utils/dist/lib/
+process-utils/child-
+process-proxy.js".
+At line:1 char:1
++ npm run build 
+2>&1 | Out-File 
+-Encoding utf8 C:\Us
+ers\HP\HexSurge\bui 
+...
++ ~~~~~~~~~~~~~~~~~~
+    + CategoryInfo  
+            : NotS  
+  pecified: (node   
+ _modules/@l...c    
+ess-proxy.js".:    
+String) [], Rem    
+oteException
+    + FullyQualifie 
+   dErrorId : Nati  
+  veCommandError
+ 
+[32mΓ£ô[39m 1545 modules transformed.
+rendering chunks...
+computing gzip size...
+[2mdist/[22m[32mindex.html                      [39m[1m[2m    0.39 kB[22m[1m[22m[2m Γöé gzip:   0.27 kB[22m
+[2mdist/[22m[35massets/index-D0u9IO2F.css       [39m[1m[2m    5.35 kB[22m[1m[22m[2m Γöé gzip:   1.71 kB[22m
+[2mdist/[22m[36massets/maplibre-gl-DSXB_5JQ.js  [39m[1m[33m  802.05 kB[39m[22m[2m Γöé gzip: 217.83 kB[22m
+[2mdist/[22m[36massets/index-D7KcTQCB.js        [39m[1m[33m1,255.55 kB[39m[22m[2m Γöé gzip: 357.56 kB[22m
+[33m
+(!) Some chunks are 
+larger than 500 kB 
+after minification. 
+Consider:
+- Using dynamic 
+import() to 
+code-split the 
+application
+- Use build.rollupOp
+tions.output.manualC
+hunks to improve 
+chunking: https://ro
+llupjs.org/configura
+tion-options/#output
+-manualchunks
+- Adjust chunk size 
+limit for this 
+warning via build.ch
+unkSizeWarningLimit.
+[39m
+[32mΓ£ô built in 30.50s[39m

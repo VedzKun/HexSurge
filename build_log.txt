@@ -1,0 +1,72 @@
+﻿
+> hexsurge-frontend@1.0.0 build
+> vite build
+
+npm : [31mfailed 
+to load config from 
+C:\Users\HP\HexSurge
+\frontend\vite.confi
+g.js[39m
+At line:1 char:1
++ npm run build 
+2>&1 | Out-File 
+-Encoding utf8 C:\Us
+ers\HP\HexSurge\bui 
+...
++ ~~~~~~~~~~~~~~~~~~
+    + CategoryInfo  
+            : NotS  
+  pecified: ([31   
+ mfailed to ....    
+config.js[39m:    
+String) [], Rem    
+oteException
+    + FullyQualifie 
+   dErrorId : Nati  
+  veCommandError
+ 
+[31merror during 
+build:
+Error [ERR_MODULE_NO
+T_FOUND]: Cannot 
+find package 'vite' 
+imported from C:\Use
+rs\HP\node_modules\.
+vite-temp\vite.confi
+g.js.timestamp-17748
+05322876-99e3b0022e5
+7c.mjs
+    at 
+packageResolve (node
+:internal/modules/es
+m/resolve:873:9)
+    at 
+moduleResolve (node:
+internal/modules/esm
+/resolve:946:18)
+    at 
+defaultResolve (node
+:internal/modules/es
+m/resolve:1188:11)
+    at ModuleLoader.
+defaultResolve (node
+:internal/modules/es
+m/loader:708:12)
+    at #cachedDefaul
+tResolve (node:inter
+nal/modules/esm/load
+er:657:25)
+    at ModuleLoader.
+resolve (node:intern
+al/modules/esm/loade
+r:640:38)
+    at ModuleLoader.
+getModuleJobForImpor
+t (node:internal/mod
+ules/esm/loader:264:
+38)
+    at 
+ModuleJob._link (nod
+e:internal/modules/e
+sm/module_job:168:49
+)[39m

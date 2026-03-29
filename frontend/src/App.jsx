@@ -1,11 +1,56 @@
+// Updated for HexSurge: Added GPS Modal, Surge Sidebar, Supply/Demand layers, and layer toggles
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { AnimatePresence } from "framer-motion";
 
 import { addGpsPoint, fetchRiderSuggestions, fetchStatsAdvanced, fetchZonesAdvanced, simulateDinnerRush } from "./api";
 import AdvancedControls from "./AdvancedControls";
 import Controls from "./Controls";
+import GPSModal from "./GPSModal";
 import LiveStats from "./LiveStats";
 import MapView from "./Map";
+import SurgeSidebar from "./SurgeSidebar";
 import ZoneList from "./ZoneList";
+
+// Added for HexSurge feature: Named Zones — H3-centroid-based lat/lng lookup for Chennai localities
+const CHENNAI_AREA_COORDS = {
+  "Tambaram":     { lat: 12.9249, lng: 80.1000 },
+  "Chengalpattu": { lat: 12.6921, lng: 79.9754 },
+  "Velachery":    { lat: 12.9815, lng: 80.2209 },
+  "OMR":          { lat: 12.9010, lng: 80.2279 },
+  "Guindy":       { lat: 13.0067, lng: 80.2206 },
+  "Anna Nagar":   { lat: 13.0850, lng: 80.2101 },
+  "Adyar":        { lat: 13.0063, lng: 80.2574 },
+  "T-Nagar":      { lat: 13.0418, lng: 80.2341 },
+  "Porur":        { lat: 13.0350, lng: 80.1570 },
+  "Perambur":     { lat: 13.1175, lng: 80.2387 },
+  "Sholinganallur": { lat: 12.9010, lng: 80.2279 },
+  "Pallavaram":   { lat: 12.9675, lng: 80.1491 },
+  "Chromepet":    { lat: 12.9516, lng: 80.1462 },
+  "Kolathur":     { lat: 13.1175, lng: 80.2230 },
+  "Ambattur":     { lat: 13.1143, lng: 80.1548 },
+};
+
+// Scatter points derived from zone H3 cell centroids approximation
+// Uses area_name lookup if backend provides it, otherwise falls back to zone centroid estimation
+function deriveScatterPoints(zones, filterFn, jitterSeed = 0) {
+  return zones
+    .filter(filterFn)
+    .flatMap((zone) => {
+      const coords = CHENNAI_AREA_COORDS[zone.area_name];
+      const baseLat = coords ? coords.lat : 13.08 + (Math.sin(zone.cell?.length ?? 0) * 0.08);
+      const baseLng = coords ? coords.lng : 80.27 + (Math.cos(zone.cell?.length ?? 0) * 0.08);
+      const count = Math.min(zone.demand_count ?? 1, 6);
+      return Array.from({ length: count }, (_, i) => {
+        const ang = (i / count) * 2 * Math.PI + jitterSeed;
+        const r = 0.003 + (i % 3) * 0.001;
+        return {
+          lat: baseLat + Math.sin(ang) * r,
+          lng: baseLng + Math.cos(ang) * r,
+          cell: zone.cell,
+        };
+      });
+    });
+}
 
 export default function App() {
   const [zones, setZones] = useState([]);
@@ -16,14 +61,21 @@ export default function App() {
   const [lastUpdatedAt, setLastUpdatedAt] = useState(null);
   const [simulateCount, setSimulateCount] = useState(10);
   const [h3Res, setH3Res] = useState(9);
-  const [mode, setMode] = useState("now"); // now | next_hour
+  const [mode, setMode] = useState("now");
   const [timeTravel, setTimeTravel] = useState(false);
   const [travelDay, setTravelDay] = useState("yesterday");
-  const [travelMinutes, setTravelMinutes] = useState(19 * 60 + 30); // 7:30 PM
+  const [travelMinutes, setTravelMinutes] = useState(19 * 60 + 30);
   const [atTs, setAtTs] = useState(null);
   const [suggestions, setSuggestions] = useState([]);
   const [hoverZone, setHoverZone] = useState(null);
-  const [form, setForm] = useState({ lat: "13.0104", lng: "80.2206", company_id: "fleet-a" });
+
+  // Added for HexSurge feature: GPS Modal state
+  const [showGPSModal, setShowGPSModal] = useState(false);
+  const [form] = useState({ lat: "13.0104", lng: "80.2206", company_id: "fleet-a" });
+
+  // Added for HexSurge feature: Supply & Demand layer toggle states
+  const [showSupply, setShowSupply] = useState(true);
+  const [showDemand, setShowDemand] = useState(true);
 
   const computeAtTs = useCallback(() => {
     const now = new Date();
@@ -67,26 +119,20 @@ export default function App() {
     const ts = computeAtTs();
     setAtTs(ts);
     await reload();
-    setStatusMessage(`Replaying ${travelDay} at ${Math.floor(travelMinutes / 60)
-      .toString()
-      .padStart(2, "0")}:${(travelMinutes % 60).toString().padStart(2, "0")}`);
+    setStatusMessage(
+      `Replaying ${travelDay} at ${Math.floor(travelMinutes / 60).toString().padStart(2, "0")}:${(travelMinutes % 60).toString().padStart(2, "0")}`
+    );
   };
 
-  const onAddPoint = async () => {
-    const lat = Number(form.lat);
-    const lng = Number(form.lng);
-    if (!Number.isFinite(lat) || lat < -90 || lat > 90 || !Number.isFinite(lng) || lng < -180 || lng > 180) {
-      setError(true);
-      setStatusMessage("Enter valid latitude/longitude before adding a point.");
-      return;
-    }
-
+  // Added for HexSurge feature: GPS Modal submit handler
+  const onAddPoint = async ({ lat, lng, company_id }) => {
     try {
       setBusy(true);
-      await addGpsPoint({ lat, lng, company_id: form.company_id || "fleet-a" });
+      await addGpsPoint({ lat, lng, company_id });
       await reload();
       setStatusMessage("Point added successfully.");
       setError(false);
+      setShowGPSModal(false);
     } catch {
       setError(true);
       setStatusMessage("Failed to add point. Please retry.");
@@ -115,6 +161,16 @@ export default function App() {
     return `${hoverZone.area_name} | ${hoverZone.demand_count} active points | ${hoverZone.surge_multiplier}x surge`;
   }, [hoverZone]);
 
+  // Added for HexSurge feature: Supply & Demand scatter point derivation
+  const supplyPoints = useMemo(
+    () => deriveScatterPoints(zones, (z) => z.heatmap_color === "green", 0),
+    [zones]
+  );
+  const demandPoints = useMemo(
+    () => deriveScatterPoints(zones, (z) => z.heatmap_color === "red" || z.heatmap_color === "orange", Math.PI),
+    [zones]
+  );
+
   return (
     <main className="app">
       <header className="hero brutal-border">
@@ -140,38 +196,49 @@ export default function App() {
       />
 
       <section className="layout-grid">
-        <MapView zones={zones} onHoverZone={setHoverZone} />
+        {/* Map with Supply & Demand ScatterplotLayers */}
+        <MapView
+          zones={zones}
+          onHoverZone={setHoverZone}
+          supplyPoints={supplyPoints}
+          demandPoints={demandPoints}
+          showSupply={showSupply}
+          showDemand={showDemand}
+        />
+
+        {/* Added for HexSurge feature: ZoneList with pulse animation */}
         <ZoneList zones={zones} />
       </section>
 
-      <section className="suggestions brutal-border">
-        <h2>Rider Assignment Suggestion</h2>
-        {suggestions.length === 0 ? (
-          <p className="muted">No moves needed right now.</p>
-        ) : (
-          suggestions.slice(0, 5).map((m, idx) => (
-            <div key={`${m.from_area}-${m.to_area}-${idx}`} className="move-row brutal-border">
-              <span>
-                Move <strong>{m.riders}</strong> riders from <strong>{m.from_area}</strong> → <strong>{m.to_area}</strong>
-              </span>
-              <span className="muted">{m.reason}</span>
-            </div>
-          ))
-        )}
-      </section>
+      {/* Added for HexSurge feature: Surge Recommendation Sidebar replaces inline suggestions section */}
+      <SurgeSidebar zones={zones} suggestions={suggestions} />
 
       <Controls
-        onAddPoint={onAddPoint}
+        onOpenModal={() => setShowGPSModal(true)}
         onSimulate={onSimulate}
         onRefresh={reload}
         busy={busy}
-        form={form}
-        setForm={setForm}
         simulateCount={simulateCount}
         setSimulateCount={setSimulateCount}
         statusMessage={statusMessage}
         error={error}
+        showSupply={showSupply}
+        setShowSupply={setShowSupply}
+        showDemand={showDemand}
+        setShowDemand={setShowDemand}
       />
+
+      {/* Added for HexSurge feature: GPS Point Modal with AnimatePresence */}
+      <AnimatePresence>
+        {showGPSModal && (
+          <GPSModal
+            open={showGPSModal}
+            onClose={() => setShowGPSModal(false)}
+            onSubmit={onAddPoint}
+            busy={busy}
+          />
+        )}
+      </AnimatePresence>
     </main>
   );
 }

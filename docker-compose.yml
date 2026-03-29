@@ -1,27 +1,32 @@
 services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: hexsurge
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
   redis:
     image: redis:7-alpine
     ports:
       - "6379:6379"
 
   backend:
-    build:
-      context: .
-      dockerfile: backend/Dockerfile
-    environment:
-      REDIS_URL: redis://redis:6379/0
+    build: .
     ports:
       - "8000:8000"
     depends_on:
+      - postgres
       - redis
-
-  frontend:
-    build:
-      context: .
-      dockerfile: frontend/Dockerfile
     environment:
-      VITE_API_BASE: http://localhost:8000
-    ports:
-      - "5173:5173"
-    depends_on:
-      - backend
+      DATABASE_URL: postgresql+asyncpg://user:password@postgres:5432/hexsurge
+      REDIS_URL: redis://redis:6379/0
+    volumes:
+      - ./backend:/app/backend
+
+volumes:
+  postgres_data:

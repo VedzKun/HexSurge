@@ -1,32 +1,19 @@
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-
-from .routers import ingest, predict, live
+from .routers import ingest, predict
 
 app = FastAPI(
-    title="HexSurge API",
-    description="Real-time H3 last-mile optimizer for Chennai",
-    version="2.0.0",
-)
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    title="PulseDrop",
+    description="H3-powered Last-Mile Delivery Optimizer",
+    version="1.0.0"
 )
 
 app.include_router(ingest.router)
 app.include_router(predict.router)
-app.include_router(live.router)
-
 
 @app.get("/")
 async def root():
     return {
-        "message": "HexSurge API is running",
+        "message": "🚀 PulseDrop API is running",
         "docs": "/docs",
-        "ingest_example": "/gps/ingest",
-        "predict_example": "/predict/13.0827/80.2707",
+        "predict_example": "/predict/13.0827/80.2707"
     }

@@ -1,0 +1,52 @@
+﻿node : node:internal
+/modules/cjs/loader:
+1210
+At line:1 char:1
++ node node_modules/
+.bin/vite.js build 
+2>&1 | Out-File 
+-Encoding utf8 C ...
++ ~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
+~~~
+    + CategoryInfo  
+            : NotS  
+  pecified: (node   
+ :internal/modul    
+es/cjs/loader:1    
+210:String) [],     
+RemoteExceptio    n
+    + FullyQualifie 
+   dErrorId : Nati  
+  veCommandError
+ 
+  throw err;
+  ^
+
+Error: Cannot find 
+module 'C:\Users\HP\
+HexSurge\frontend\no
+de_modules\.bin\vite
+.js'
+    at Module._resol
+veFilename (node:int
+ernal/modules/cjs/lo
+ader:1207:15)
+    at Module._load 
+(node:internal/modul
+es/cjs/loader:1038:2
+7)
+    at Function.exec
+uteUserEntryPoint 
+[as runMain] (node:i
+nternal/modules/run_
+main:164:12)
+    at node:internal
+/main/run_main_modul
+e:28:49 {
+  code: 
+'MODULE_NOT_FOUND',
+  requireStack: []
+}
+
+Node.js v20.19.5
