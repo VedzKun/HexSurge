@@ -58,3 +58,10 @@ export async function fetchRiderSuggestions({ res: h3Res, at, window_minutes }) 
   if (!res.ok) throw new Error("Failed to fetch rider suggestions");
   return res.json();
 }
+
+// Added for Driver View: fetch live driver positions from backend
+export async function fetchDrivers() {
+  const res = await fetch(`${API_BASE}/gps/drivers`);
+  if (!res.ok) throw new Error("Failed to fetch drivers");
+  return res.json();
+}

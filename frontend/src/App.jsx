@@ -1,10 +1,14 @@
-// Updated for HexSurge: Added GPS Modal, Surge Sidebar, Supply/Demand layers, and layer toggles
+// Updated for HexSurge: Added GPS Modal, Surge Sidebar, Supply/Demand layers, layer toggles
+// Added for Driver View: Routes for /admin (default) and /driver, live driver dots on map
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { AnimatePresence } from "framer-motion";
+import { Routes, Route } from "react-router-dom";
 
-import { addGpsPoint, fetchRiderSuggestions, fetchStatsAdvanced, fetchZonesAdvanced, simulateDinnerRush } from "./api";
+import { addGpsPoint, fetchDrivers, fetchRiderSuggestions, fetchStatsAdvanced, fetchZonesAdvanced, simulateDinnerRush } from "./api";
 import AdvancedControls from "./AdvancedControls";
 import Controls from "./Controls";
+import DriversPanel from "./DriversPanel";
+import DriverView from "./DriverView";
 import GPSModal from "./GPSModal";
 import LiveStats from "./LiveStats";
 import MapView from "./Map";
@@ -31,7 +35,6 @@ const CHENNAI_AREA_COORDS = {
 };
 
 // Scatter points derived from zone H3 cell centroids approximation
-// Uses area_name lookup if backend provides it, otherwise falls back to zone centroid estimation
 function deriveScatterPoints(zones, filterFn, jitterSeed = 0) {
   return zones
     .filter(filterFn)
@@ -52,7 +55,8 @@ function deriveScatterPoints(zones, filterFn, jitterSeed = 0) {
     });
 }
 
-export default function App() {
+// ── Admin Dashboard ──
+function AdminDashboard() {
   const [zones, setZones] = useState([]);
   const [stats, setStats] = useState({});
   const [busy, setBusy] = useState(false);
@@ -71,11 +75,13 @@ export default function App() {
 
   // Added for HexSurge feature: GPS Modal state
   const [showGPSModal, setShowGPSModal] = useState(false);
-  const [form] = useState({ lat: "13.0104", lng: "80.2206", company_id: "fleet-a" });
 
   // Added for HexSurge feature: Supply & Demand layer toggle states
   const [showSupply, setShowSupply] = useState(true);
   const [showDemand, setShowDemand] = useState(true);
+
+  // Added for Driver View: live driver positions
+  const [drivers, setDrivers] = useState([]);
 
   const computeAtTs = useCallback(() => {
     const now = new Date();
@@ -90,14 +96,16 @@ export default function App() {
     try {
       const effectiveAt = timeTravel ? atTs ?? computeAtTs() : null;
       const params = { res: h3Res, at: effectiveAt, window_minutes: 15, mode };
-      const [zonesRes, statsRes, suggRes] = await Promise.all([
+      const [zonesRes, statsRes, suggRes, driversRes] = await Promise.all([
         fetchZonesAdvanced(params),
         fetchStatsAdvanced(params),
         fetchRiderSuggestions({ res: h3Res, at: effectiveAt, window_minutes: 15 }),
+        fetchDrivers(),
       ]);
       setZones(zonesRes.zones ?? []);
       setStats(statsRes ?? {});
       setSuggestions(suggRes.moves ?? []);
+      setDrivers(driversRes.drivers ?? []);
       setError(false);
       const stamp = new Date().toLocaleTimeString();
       setLastUpdatedAt(stamp);
@@ -171,6 +179,12 @@ export default function App() {
     [zones]
   );
 
+  // Added for Driver View: merge stats with driver count
+  const enrichedStats = useMemo(() => ({
+    ...stats,
+    drivers_online: drivers.length,
+  }), [stats, drivers]);
+
   return (
     <main className="app">
       <header className="hero brutal-border">
@@ -179,7 +193,7 @@ export default function App() {
         {lastUpdatedAt ? <p>Last updated: {lastUpdatedAt}</p> : null}
       </header>
 
-      <LiveStats stats={stats} />
+      <LiveStats stats={enrichedStats} />
 
       <AdvancedControls
         h3Res={h3Res}
@@ -196,7 +210,7 @@ export default function App() {
       />
 
       <section className="layout-grid">
-        {/* Map with Supply & Demand ScatterplotLayers */}
+        {/* Map with Supply & Demand ScatterplotLayers + live driver dots */}
         <MapView
           zones={zones}
           onHoverZone={setHoverZone}
@@ -204,13 +218,17 @@ export default function App() {
           demandPoints={demandPoints}
           showSupply={showSupply}
           showDemand={showDemand}
+          driverPoints={drivers}
         />
 
-        {/* Added for HexSurge feature: ZoneList with pulse animation */}
-        <ZoneList zones={zones} />
+        {/* Right column: zone list + drivers panel */}
+        <div className="right-col">
+          <ZoneList zones={zones} />
+          <DriversPanel drivers={drivers} />
+        </div>
       </section>
 
-      {/* Added for HexSurge feature: Surge Recommendation Sidebar replaces inline suggestions section */}
+      {/* Added for HexSurge feature: Surge Recommendation Sidebar */}
       <SurgeSidebar zones={zones} suggestions={suggestions} />
 
       <Controls
@@ -240,5 +258,14 @@ export default function App() {
         )}
       </AnimatePresence>
     </main>
+  );
+}
+
+export default function App() {
+  return (
+    <Routes>
+      <Route path="/driver" element={<DriverView />} />
+      <Route path="*" element={<AdminDashboard />} />
+    </Routes>
   );
 }

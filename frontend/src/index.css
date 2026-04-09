@@ -62,7 +62,7 @@ button {
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(170px, 1fr));
+  grid-template-columns: repeat(5, minmax(150px, 1fr));
   gap: 14px;
 }
 
@@ -85,6 +85,14 @@ button {
 .layout-grid {
   display: grid;
   grid-template-columns: 2.2fr 1fr;
+  gap: 14px;
+  min-height: 480px;
+}
+
+/* Added for Driver View: right column stacks ZoneList + DriversPanel */
+.right-col {
+  display: grid;
+  grid-template-rows: 1fr auto;
   gap: 14px;
   min-height: 480px;
 }
@@ -278,7 +286,7 @@ button {
 
 @media (max-width: 1080px) {
   .stats-grid {
-    grid-template-columns: repeat(2, minmax(140px, 1fr));
+    grid-template-columns: repeat(3, minmax(130px, 1fr));
   }
 
   .layout-grid {
@@ -490,3 +498,341 @@ button {
   box-shadow: 0 0 6px #a050f0;
 }
 
+
+/* ══════════════════════════════════════════════════════
+   DRIVER VIEW — mobile-first light theme
+   Route: /driver
+   ══════════════════════════════════════════════════════ */
+
+.dv-root {
+  min-height: 100svh;
+  background: #ffffff;
+  color: #111111;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  font-family: "Inter", "Arial", sans-serif;
+  max-width: 480px;
+  margin: 0 auto;
+  position: relative;
+}
+
+/* Setup screen */
+.dv-setup-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  min-height: 100svh;
+  padding: 32px 24px;
+  text-align: center;
+}
+
+.dv-logo {
+  font-size: 4rem;
+  color: #ff6600;
+  line-height: 1;
+}
+
+.dv-brand {
+  margin: 0;
+  font-size: 2.4rem;
+  font-weight: 900;
+  color: #111;
+  letter-spacing: -0.02em;
+}
+
+.dv-setup-sub {
+  margin: 0;
+  color: #666;
+  font-size: 1rem;
+}
+
+.dv-id-input {
+  width: 100%;
+  border: 3px solid #111;
+  border-radius: 12px;
+  padding: 18px 16px;
+  font-size: 1.2rem;
+  font-family: inherit;
+  background: #f7f7f7;
+  color: #111;
+  text-align: center;
+  outline: none;
+}
+
+.dv-id-input:focus {
+  border-color: #ff6600;
+  background: #fff;
+}
+
+/* Shared button */
+.dv-btn {
+  width: 100%;
+  padding: 22px 16px;
+  border: none;
+  border-radius: 14px;
+  font-size: 1.25rem;
+  font-weight: 800;
+  font-family: inherit;
+  cursor: pointer;
+  letter-spacing: 0.01em;
+  transition: opacity 0.15s, transform 0.1s;
+}
+
+.dv-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.dv-btn-primary {
+  background: #ff6600;
+  color: #ffffff;
+  box-shadow: 0 6px 20px rgba(255, 102, 0, 0.35);
+}
+
+.dv-btn-primary:hover:not(:disabled) {
+  background: #e55a00;
+}
+
+.dv-btn-delivered {
+  background: #111111;
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+}
+
+.dv-btn-delivered:hover:not(:disabled) {
+  background: #222;
+}
+
+.dv-btn-dim {
+  background: #cccccc;
+  color: #888;
+  box-shadow: none;
+}
+
+/* Header */
+.dv-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px 12px;
+  border-bottom: 2px solid #ebebeb;
+  background: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.dv-logo-sm {
+  font-size: 1.2rem;
+  font-weight: 900;
+  color: #ff6600;
+  letter-spacing: -0.01em;
+}
+
+.dv-driver-chip {
+  background: #f0f0f0;
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #444;
+}
+
+/* Zone banner */
+.dv-zone-banner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 20px 10px;
+  gap: 4px;
+  background: #fff;
+}
+
+.dv-zone-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #999;
+  text-transform: uppercase;
+}
+
+.dv-zone-name {
+  font-size: 2rem;
+  font-weight: 900;
+  color: #111;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.dv-h3-chip {
+  font-size: 0.65rem;
+  color: #bbb;
+  font-family: monospace;
+  margin-top: 2px;
+}
+
+/* Map */
+.dv-map-wrap {
+  flex: 1;
+  min-height: 240px;
+  max-height: 320px;
+  border-top: 2px solid #ebebeb;
+  border-bottom: 2px solid #ebebeb;
+  overflow: hidden;
+  position: relative;
+  background: #e8f4e8;
+}
+
+.dv-map-frame {
+  display: block;
+  border: none;
+}
+
+.dv-map-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #999;
+  gap: 8px;
+  font-size: 0.9rem;
+}
+
+/* Status pill */
+.dv-status-pill {
+  margin: 12px 20px 0;
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-align: center;
+  cursor: pointer;
+}
+
+.dv-status-ok    { background: #e8f9ee; color: #1a7a3e; }
+.dv-status-error { background: #fff0ee; color: #c0392b; }
+.dv-status-delivered { background: #fffae8; color: #b7700d; }
+
+/* Action buttons */
+.dv-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 20px 0;
+}
+
+.dv-footer-hint {
+  text-align: center;
+  color: #bbb;
+  font-size: 0.8rem;
+  margin: 12px 0 4px;
+  padding: 0 20px;
+}
+
+.dv-logout {
+  background: none;
+  border: none;
+  color: #bbb;
+  font-size: 0.78rem;
+  text-align: center;
+  padding: 10px 0 24px;
+  cursor: pointer;
+  font-family: inherit;
+  text-decoration: underline;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.dv-logout:hover { color: #888; }
+
+
+/* ══════════════════════════════════════════════════════
+   DRIVERS PANEL — admin dashboard component
+   ══════════════════════════════════════════════════════ */
+
+.drivers-panel {
+  padding: 12px;
+  display: grid;
+  gap: 10px;
+  grid-template-rows: auto 1fr;
+}
+
+.dp-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dp-title {
+  margin: 0;
+  font-size: 1rem;
+  color: #48c774;
+}
+
+.dp-count {
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: #fff;
+  min-width: 2rem;
+  text-align: right;
+}
+
+.dp-list {
+  display: grid;
+  gap: 6px;
+  align-content: start;
+  overflow-y: auto;
+  max-height: 220px;
+}
+
+.dp-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+}
+
+.dp-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #39ff14;
+  box-shadow: 0 0 6px #39ff14;
+  flex-shrink: 0;
+  animation: dp-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes dp-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.55; transform: scale(0.8); }
+}
+
+.dp-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.dp-name {
+  font-weight: 800;
+  font-size: 0.88rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dp-zone {
+  font-size: 0.72rem;
+}
+
+.dp-time {
+  font-size: 0.7rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+}

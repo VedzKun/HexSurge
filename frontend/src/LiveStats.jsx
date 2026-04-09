@@ -36,6 +36,8 @@ export default function LiveStats({ stats }) {
     { title: "Hot Zones Right Now", value: stats.hot_zones_right_now ?? 0, suffix: "", decimals: 0 },
     { title: "Average Surge Multiplier", value: stats.average_surge_multiplier ?? 1, suffix: "x", decimals: 2 },
     { title: "Riders Needed in Hot Zones", value: stats.riders_needed_hot_zones ?? 0, suffix: "", decimals: 0 },
+    // Added for Driver View: show live driver count in admin stats
+    { title: "Drivers Online", value: stats.drivers_online ?? 0, suffix: "", decimals: 0 },
   ];
 
   return (

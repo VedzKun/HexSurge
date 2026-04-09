@@ -36,6 +36,8 @@ export default function MapView({
   demandPoints,
   showSupply,
   showDemand,
+  // Added for Driver View: live driver positions as green moving dots
+  driverPoints = [],
 }) {
   const mainLayer = new H3HexagonLayer({
     id: "h3-zones",
@@ -101,17 +103,36 @@ export default function MapView({
     radiusMaxPixels: 14,
   });
 
+  // Added for Driver View: bright green dots for live driver positions
+  const driverLayer = new ScatterplotLayer({
+    id: "driver-dots",
+    data: driverPoints,
+    pickable: true,
+    getPosition: (d) => [d.lng, d.lat],
+    getRadius: 60,
+    getFillColor: [57, 255, 20, 255],   // neon green
+    getLineColor: [0, 0, 0, 200],
+    stroked: true,
+    lineWidthMinPixels: 2,
+    radiusUnits: "meters",
+    radiusMinPixels: 8,
+    radiusMaxPixels: 22,
+    transitions: { getPosition: 800 },
+  });
+
   return (
     <div className="map-shell brutal-border">
       <DeckGL
         style={{ position: "relative", width: "100%", height: "100%" }}
         initialViewState={INITIAL_VIEW_STATE}
         controller
-        layers={[neighborGlowLayer, mainLayer, supplyLayer, demandLayer]}
+        layers={[neighborGlowLayer, mainLayer, supplyLayer, demandLayer, driverLayer]}
         getTooltip={({ object }) =>
           object
             ? {
-                text: `${object.area_name}\nDemand: ${object.demand_count}\nSurge: ${object.surge_multiplier}x\nNeighbor pressure: ${object.neighbor_pressure ?? 0}`,
+                text: object.driver_id
+                  ? `🟢 Driver: ${object.driver_id}\nZone: ${object.area_name}`
+                  : `${object.area_name}\nDemand: ${object.demand_count}\nSurge: ${object.surge_multiplier}x\nNeighbor pressure: ${object.neighbor_pressure ?? 0}`,
               }
             : null
         }
